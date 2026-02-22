@@ -1,13 +1,11 @@
 # Generate the parallel requests based on the ThreadPool Executor
 from concurrent.futures import ThreadPoolExecutor as PoolExecutor
-import sys
 import time
 import glob
 import requests
 import threading
 import uuid
 import base64
-import json
 import os
 import argparse
 
@@ -59,10 +57,10 @@ def parse_argmuments() -> argparse.Namespace:
     )
 
     parser.add_argument(
-    "--output",
-    type=str,
-    default=None,
-    help="Path to CSV file to store experiment results"
+        "--output",
+        type=str,
+        default=None,
+        help="Path to CSV file to store experiment results （这里直接写导出的文件路径）"
     )
 
     return parser.parse_args()

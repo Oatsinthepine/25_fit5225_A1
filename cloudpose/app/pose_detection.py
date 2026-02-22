@@ -176,20 +176,13 @@ def detect_base64_img(base64_img_str, img_format='.jpg'):
             }
             res["boxes"].append(box)
 
-        # Save the image
-        # img_rgb = cv2.cvtColor(decoded_img, cv2.COLOR_BGR2RGB)  # OpenCV default code function is BGR, PIL needs RGB
-        # # Convert PIL image
-        # pil_img = Image.fromarray(img_rgb)
-        # # write to disk cache
-        # buffered = BytesIO()
-        # pil_img.save(buffered, format="JPEG")
-        # base64_img = base64.b64encode(buffered.getvalue()).decode("utf-8")
-
-        # res["annotated_img"] = base64_img
     return res
 
+
+
 def annotate_img(base64_img_str, img_format='.jpg'):
-    
+  
+
     base64_img_str = base64_img_str.split(",")[-1]  #Remove the base64 header such as "data:image/jpeg;base64"
 
     #decode the base64 string
@@ -198,9 +191,12 @@ def annotate_img(base64_img_str, img_format='.jpg'):
     nparr = np.frombuffer(img_bytes, np.uint8)
     decoded_img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
     results = None
+    
     with lock:
         results = model(decoded_img)
-    res = {}
+    
+    res = dict()
+    
     if results is None:
         log.error("Error: Could not detect pose in the image")
         res["err"] = "Error: Could not detect pose in the image and results is None"
@@ -265,21 +261,25 @@ def annotate_img(base64_img_str, img_format='.jpg'):
 
 
 def main():
+    """
+    CLI 入口：用本地图片做一次 pose 预测并保存标注图。
+    路径基于当前模块所在目录，与 MODEL_PATH 一致，避免受 CWD 影响。
+    """
     try:
-        log.info("Loading YOLO pose detection model...")
-        # model = YOLO('./yolo11x-pose.pt')
-        model = YOLO(MODEL_PATH)
+        # 使用模块已加载的全局 model，不再重复加载
+        image_path = os.path.join(BASE_DIR, 'test.jpg')
+        output_image = os.path.join(BASE_DIR, 'test_with_keypoints.jpg')
 
-        # Load a pretrained YOLOv11x pose model
-        log.info("Model is loaded.")
-        # Predict on an image
-        image_path = './test.jpg'  # Replace with your image path
-        output_image = 'test_with_keypoints.jpg'
-        result = predict(model,image_path,output_image)
-        log.info(result)
-    
+        if not os.path.isfile(image_path):
+            log.warning(f"Test image not found: {image_path}. Put test.jpg in cloudpose/app/ or pass path.")
+            return
+
+        log.info("Running pose prediction (using already-loaded model).")
+        result = predict(model, image_path, output_image)
+        log.info(f"Result: {result}; output saved to {output_image}")
     except Exception as e:
-        print(f"Exception: {e}")
+        log.exception("Exception in main")
+        raise
 
 
 
