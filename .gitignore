@@ -1,0 +1,14 @@
+.DS_Store
+
+*.pt
+.venv/
+__pycache__/
+*.pyc
+
+.idea/
+*.jpg
+*.png
+
+*.json
+
+
