@@ -10,9 +10,9 @@ main.py
 
 from fastapi import FastAPI
 from pydantic import BaseModel
-import base64
-import numpy as np
-import cv2
+
+from .pose_detection import detect_base64_img, annotate_img
+
 
 
 app = FastAPI()
@@ -23,16 +23,38 @@ class PoseRequest(BaseModel):
 
 @app.post("/api/pose_estimation")
 async def pose_estimation(request: PoseRequest):
+    """
+    调用 detect_base64_img 进行pose检测
+    HTTP 接收
+    数据解码
+    调用 pose_service
+    返回 JSON
+    """
 
-    image_bytes = base64.b64decode(request.image)
-    nparr = np.frombuffer(image_bytes, np.uint8)
-    img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
-
-    if img is None:
-        return {"error": "Image decoding failed"}
+    result = detect_base64_img(request.image)
 
     return {
         "id": request.id,
-        "shape": img.shape
+        **result
     }
 
+
+@app.post("/api/pose_estimation_annotation")
+async def pose_estimation_annotation(request: PoseRequest):
+    """
+    调用 annotate_img 进行pose检测并标注
+
+    """
+
+    result = annotate_img(request.image)
+
+    if "annotated_img" not in result:
+        return {
+            "id":request.id,
+            "error":result.get("err", "Unknown error")
+        }
+
+    return {
+        "id":request.id,
+        "image": result["annotated_img"]
+    }

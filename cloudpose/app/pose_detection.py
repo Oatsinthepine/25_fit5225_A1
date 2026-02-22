@@ -1,4 +1,5 @@
 from ultralytics import YOLO
+import os
 import cv2
 import logging
 import base64
@@ -58,7 +59,20 @@ def predict(model, src_img, dst_img):
     return results
 
 log.info("Loading YOLO pose detection model...")
-model = YOLO('./yolo11x-pose.pt')
+
+
+'''
+这里进行修改，使用os模块进行动态模型路径加载防止路径错误.
+这样：
+	•	本地 OK
+	•	Docker OK
+	•	K8s OK
+'''
+
+BASE_DIR = os.path.dirname(__file__)
+MODEL_PATH = os.path.join(BASE_DIR, 'model', 'yolo11x-pose.pt')
+model = YOLO(MODEL_PATH)
+
 lock = threading.Lock()
 
 def detect_base64_img(base64_img_str, img_format='.jpg'):
@@ -70,6 +84,7 @@ def detect_base64_img(base64_img_str, img_format='.jpg'):
     nparr = np.frombuffer(img_bytes, np.uint8)
     decoded_img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
     results = None
+    
     with lock:
         results = model(decoded_img)
 
@@ -81,6 +96,7 @@ def detect_base64_img(base64_img_str, img_format='.jpg'):
         "speed_inference": 0,
         "speed_postprocess": 0,
     }
+    
     if results is None:
         log.error("Error: Could not detect pose in the image")
         res["err"] = "Error: Could not detect pose in the image and results is None"
@@ -173,6 +189,7 @@ def detect_base64_img(base64_img_str, img_format='.jpg'):
     return res
 
 def annotate_img(base64_img_str, img_format='.jpg'):
+    
     base64_img_str = base64_img_str.split(",")[-1]  #Remove the base64 header such as "data:image/jpeg;base64"
 
     #decode the base64 string
@@ -242,12 +259,17 @@ def annotate_img(base64_img_str, img_format='.jpg'):
         base64_img = base64.b64encode(buffered.getvalue()).decode("utf-8")
 
         res["annotated_img"] = base64_img
+    
     return res
+
+
 
 def main():
     try:
         log.info("Loading YOLO pose detection model...")
-        model = YOLO('./yolo11x-pose.pt')
+        # model = YOLO('./yolo11x-pose.pt')
+        model = YOLO(MODEL_PATH)
+
         # Load a pretrained YOLOv11x pose model
         log.info("Model is loaded.")
         # Predict on an image
@@ -255,8 +277,11 @@ def main():
         output_image = 'test_with_keypoints.jpg'
         result = predict(model,image_path,output_image)
         log.info(result)
+    
     except Exception as e:
         print(f"Exception: {e}")
+
+
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
