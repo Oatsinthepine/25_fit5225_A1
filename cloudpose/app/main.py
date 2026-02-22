@@ -1,3 +1,13 @@
+"""
+main.py
+只负责：
+	•	HTTP 接收
+	•	数据解码
+	•	调用 pose_service
+	•	返回 JSON
+
+"""
+
 from fastapi import FastAPI
 from pydantic import BaseModel
 import base64

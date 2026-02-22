@@ -13,3 +13,12 @@ python cloudpose_client.py  <input folder name> <URL> <num_threads>
 ## Sample run command
 
 python cloudpose_client.py  inputfolder/  http://localhost:8000/api/pose_detection 4
+
+## 为什么做 Service Layer Separation
+
+因为未来：
+	•	你可能做第二个 endpoint（annotated image）
+	•	你可能做 GPU 加速
+	•	你可能改模型
+
+但 API 层不用动。

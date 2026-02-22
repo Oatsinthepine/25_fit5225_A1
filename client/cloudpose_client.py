@@ -7,7 +7,7 @@ import requests
 import threading
 import uuid
 import base64
-import  json
+import json
 import os
 
 #send http request
@@ -22,11 +22,12 @@ def call_cloudpose_service(image):
             data['image'] =  base64.b64encode(image_file.read()).decode('utf-8')
 
         data ['id'] = str(img_id)
-        headers = {'Content-Type': 'application/json'}
-
+        
+        # 这里是不对的，json = xxx 直接会添加 json.dumps, 不需要额外做一遍，然后也会添加header
+        # headers = {'Content-Type': 'application/json'}
         # response = requests.post(url, json= json.dumps(data), headers = headers)
 
-        response = requests.post(url, data=data)
+        response = requests.post(url, json = data)
 
         if response.ok:
             output = "Thread : {},  input image: {},  output:{}".format(threading.current_thread().getName(),
