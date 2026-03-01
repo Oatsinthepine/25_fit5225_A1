@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cloudpose-deployment
+spec:
+  replicas: 1 # 作业要求一开始先使用1个pod，后续再扩展
+  selector:
+    matchLabels:
+      app: cloudpose
+  template:
+    metadata:
+      labels:
+        app: cloudpose
+    spec:
+      containers:
+        - name: cloudpose
+          image: coolguyinurarea/cloudpose:v1
+          ports:
+          - containerPort: 60000
+          resources:
+            requests:
+              cpu: "0.5"
+              memory: "512Mi"
+            limits:
+              cpu: "0.5"
+              memory: "512Mi"
+          

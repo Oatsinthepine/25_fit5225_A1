@@ -1,7 +1,20 @@
+# 这下面是 本地开发时需要安装的核心依赖， 不是打 Docker 镜像的核心
+
+# fastapi
+# uvicorn
+# ultralytics
+# opencv-python
+# torch
+# torchvision
+# python-multipart
+
+# ===============================
+# 打 Docker 镜像的核心依赖
+# ===============================
+
 fastapi
-uvicorn
+uvicorn[standard]
 ultralytics
-opencv-python
-torch
-torchvision
-python-multipart
+opencv-python-headless
+numpy
+pillow

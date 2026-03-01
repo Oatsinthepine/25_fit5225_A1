@@ -1,0 +1,7 @@
+client/
+scripts/
+*.jpg
+*.csv
+__pycache__/
+*.pyc
+.git
