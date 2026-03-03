@@ -14,14 +14,14 @@ spec:
     spec:
       containers:
         - name: cloudpose
-          image: coolguyinurarea/cloudpose:v1
+          image: coolguyinurarea/cloudpose:v2
           ports:
           - containerPort: 60000
           resources:
             requests:
               cpu: "0.5"
-              memory: "512Mi"
+              memory: "1024Mi"
             limits:
               cpu: "0.5"
-              memory: "512Mi"
+              memory: "1024Mi"
           
