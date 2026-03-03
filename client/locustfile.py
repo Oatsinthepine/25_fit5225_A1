@@ -39,10 +39,14 @@ import uuid
 import base64
 import random
 
+
+host = "http://161.33.91.68:30007" # 这个 IP 就是我 OCI k8s master 的 public IP 地址
+
+
+
 def get_images(input_folder):
     return glob.glob(input_folder + "*.jpg")
 
-IMAGES = get_images("client/inputfolder/")
 
 class CloudPoseUser(HttpUser):
 
@@ -51,18 +55,24 @@ class CloudPoseUser(HttpUser):
     @task
     def pose_estimation(self):
 
-        image = random.choice(IMAGES)
+        IMAGES = []
 
-        with open(image, 'rb') as image_file:
-            img_base64 = base64.b64encode(image_file.read()).decode('utf-8')
+        for img in get_images("client/inputfolder/"):
+            with open(img, "rb") as f:
+                IMAGES.append(base64.b64encode(f.read()).decode('utf-8'))
+
+        image = random.choice(IMAGES)
 
         payload = {
             "id": str(uuid.uuid4()),
-            "image": img_base64
+            "image": image
         }
 
-        self.client.post(
+        with self.client.post(
             "/api/pose_estimation",
             json=payload,
-            name="/api/pose_estimation"
-        )
+            name="/api/pose_estimation",
+            catch_response=True
+        ) as response:
+            if response.status_code != 200:
+                response.failure("Request failed")
