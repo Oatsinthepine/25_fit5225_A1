@@ -4,7 +4,8 @@ metadata:
   name: cloudpose-deployment
 spec:
   # replicas: 1 # 作业要求一开始先使用1个pod，后续再扩展
-  replicas: 2 # 现在是第二轮压测，先扩展到2个pod
+  # replicas: 2 # 现在是第二轮压测，先扩展到2个pod
+  replicas: 8 # 现在是第三轮压测，直接扩展到8个pod
   selector:
     matchLabels:
       app: cloudpose
