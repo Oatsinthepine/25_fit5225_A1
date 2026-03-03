@@ -1,7 +1,10 @@
 .DS_Store
 
 *.pt
+
 .venv/
+locust-venv/
+
 __pycache__/
 *.pyc
 
