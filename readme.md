@@ -1,34 +1,171 @@
-# cloudpose_client.py
+# CloudPose Kubernetes Benchmarking
 
-cloudpose_client is a Python script to invoke your web service endpoint according to the Assignment 1 specification
+## Overview
 
-## Installation
+CloudPose Benchmark is a cloud-native performance evaluation project designed to analyze the scalability and performance characteristics of an AI inference service deployed on Kubernetes.
 
-All the required packages are part of the basic python installation. Please use python 3.10 or higher.
+The project benchmarks a human pose estimation service built using FastAPI and YOLO-based inference, deployed in a containerized environment on a Kubernetes cluster hosted on Oracle Cloud Infrastructure (OCI).
 
-## Usage format
+To simulate realistic workloads, Locust is used as a distributed load testing framework running on a separate Azure virtual machine. The benchmarking workflow is fully automated using scripting pipelines that dynamically scale Kubernetes deployments and execute headless load tests.
 
-python cloudpose_client.py  <input folder name> <URL> <num_threads>
-
-## 目前开发的时候用这个命令测试 （我下面打算重构 cloudpose_client.py， 使用argparse，这样更工程化）：
-`python3 ./client/cloudpose_client.py ./client/inputfolder http://localhost:60001/api/pose_estimation 1`
+The project demonstrates how AI inference services can be evaluated and scaled using cloud-native infrastructure.
 
 
-## Sample run command
-
-python cloudpose_client.py  inputfolder/  http://localhost:8000/api/pose_detection 4
-
-## 目前开发的时候仍然用这个命令启动fastapi server：
-`uvicorn cloudpose.app.main:app --host 0.0.0.0 --port 60001`
-
+### **For the detailed report, please view this experiment report pdf: [FIT5225 A1 Experiment Report.pdf](FIT5225%20A1%20Experiment%20Report.pdf)**
 
 ---
 
-## 为什么做 Service Layer Separation
+## Project Architecture
 
-因为未来：
-	•	你可能做第二个 endpoint（annotated image）
-	•	你可能做 GPU 加速
-	•	你可能改模型
+The benchmarking architecture follows a distributed setup to simulate realistic production workloads.
 
-但 API 层不用动。
+```plaintext
+Load Generator (Azure VM)
+        │
+        │ HTTP Requests (Locust)
+        ▼
+Kubernetes NodePort Service
+        │
+OCI Kubernetes Cluster
+        │
+CloudPose Pods
+(FastAPI + YOLO Inference)
+        │
+Pose Estimation Results
+(JSON Response)
+```
+
+Key components:
+
+| Component              | Description                                  |
+| ---------------------- | -------------------------------------------- |
+| Azure VM               | Load generator running Locust                |
+| OCI Kubernetes Cluster | Hosts containerized inference service (1 Controller / master; 2 workers)       |
+| CloudPose Service      | FastAPI-based API performing pose estimation |
+| NodePort Service       | Exposes inference API externally             |
+| Automation Script      | Runs benchmarking experiments                |
+
+
+## Features
+
+- Cloud-native AI inference deployment
+
+- Automated load testing using Locust with orchestration
+
+- Distributed benchmarking architecture
+
+- Performance evaluation and visualization
+
+
+## Project Structure
+
+```plaintext
+CloudPose-Benchmark
+│
+├── client
+│   ├── locustfile.py
+│   └── inputfolder
+│       └── sample images (128 images, omitted to pushed to remote repo)
+│
+├── experiment
+│   ├── run_experiment.ps1
+│   └── results
+│       └── locust csv outputs
+│
+├── plot_results.py
+│
+├── deployment
+│   ├── cloudpose-deployment.yaml
+│   └── cloudpose-service.yaml
+│
+└── report
+```
+
+---
+
+## Inference Service
+
+The CloudPose service exposes a REST API for pose estimation.
+
+### Endpoint
+
+```plaintext
+POST /api/pose_estimation
+```
+
+### Request format
+
+```json
+{
+  "id": "uuid",
+  "image": "base64 encoded image"
+}
+```
+
+### Response format
+
+```json
+{
+  "id": "...",
+  "count": 1,
+  "boxes": [...],
+  "keypoints": [...],
+  "speed_inference": ...
+}
+```
+
+The service uses a YOLO-based deep learning model to detect human pose keypoints from input images.
+
+
+## Benchmarking Workflow
+
+The benchmarking pipeline automates the entire experiment process.
+
+```plaintext
+run_experiment.ps1
+        │
+        ├─ scale Kubernetes deployment
+        │
+        ├─ wait for pods ready
+        │
+        ├─ run Locust headless load test
+        │
+        └─ export performance metrics
+```        
+
+Each experiment automatically generates Locust CSV files containing performance statistics.
+
+---
+
+## Technology Used
+
+| Technology | Purpose                            |
+| ---------- | ---------------------------------- |
+| Kubernetes | Container orchestration            |
+| Docker     | Containerized inference service    |
+| FastAPI    | Inference API                      |
+| YOLO       | Pose estimation model              |
+| Locust     | Load testing framework             |
+| Python     | Experiment automation and analysis |
+| PowerShell | Benchmark orchestration            |
+
+
+## Key Learning Outcomes
+
+This project demonstrates several important cloud-native concepts:
+
+        - deploying AI inference services on Kubernetes
+
+        - evaluating performance of containerized ML workloads
+
+        - designing distributed benchmarking experiments
+
+        - implementing automated load testing pipelines
+
+        - analyzing scalability of microservices architectures
+
+---
+
+## License
+
+This project is intended for educational purposes as part of Monash Faculty of IT 2025 Fit5225 assignment. For educational purpose only.
