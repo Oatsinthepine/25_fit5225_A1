@@ -4,6 +4,7 @@
 
 .venv/
 locust-venv/
+locust_env/
 
 __pycache__/
 *.pyc
