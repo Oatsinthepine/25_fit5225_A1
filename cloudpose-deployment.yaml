@@ -20,6 +20,8 @@ spec:
           image: coolguyinurarea/cloudpose:v2
           ports:
           - containerPort: 60000
+          # Memory limit set to 1024Mi to prevent OOMKilled during pose model inference.
+          # Earlier experiments with lower limits caused container restarts.
           resources:
             requests:
               cpu: "0.5"

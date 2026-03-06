@@ -10,7 +10,6 @@ main.py
 
 from fastapi import FastAPI
 from pydantic import BaseModel
-
 from .pose_detection import detect_base64_img, annotate_img
 
 
@@ -22,7 +21,7 @@ class PoseRequest(BaseModel):
     image: str
 
 @app.post("/api/pose_estimation")
-async def pose_estimation(request: PoseRequest):
+async def pose_estimation(request: PoseRequest) -> dict:
     """
     调用 detect_base64_img 进行pose检测
     HTTP 接收
@@ -40,10 +39,9 @@ async def pose_estimation(request: PoseRequest):
 
 
 @app.post("/api/pose_estimation_annotation")
-async def pose_estimation_annotation(request: PoseRequest):
+async def pose_estimation_annotation(request: PoseRequest) -> dict:
     """
     调用 annotate_img 进行pose检测并标注
-
     """
 
     result = annotate_img(request.image)

@@ -1,3 +1,22 @@
+# CloudPose Benchmark Experiment Runner
+#
+# Runs automated benchmarking experiments.
+#
+# Steps:
+# 1) Scale Kubernetes deployment on OCI cluster
+# 2) Wait for rollout
+# 3) Run Locust load test from Azure VM
+# 4) Save CSV results to experiment/results
+#
+# Requirements:
+# - Windows PowerShell
+# - Locust installed
+# - SSH key configured for OCI master node
+#
+# Usage:
+# Run from repository root:
+# .\experiment\run_experiment.ps1
+
 cd C:\locust_test\25_fit5225_A1
 
 $HOST_URL = "http://161.33.91.68:30007"

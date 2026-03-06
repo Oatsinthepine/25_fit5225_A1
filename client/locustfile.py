@@ -1,3 +1,20 @@
+"""
+Locust load test for CloudPose inference service.
+
+Tests:
+POST /api/pose_estimation
+
+Usage:
+locust -f client/locustfile.py --host http://<IP>:30007 --headless -u USERS -r RATE --run-time DURATION --csv results_prefix
+
+Inputs:
+Images from client/inputfolder/*.jpg
+
+Notes:
+Images are loaded once at startup and encoded to base64.
+Host should point to the Kubernetes NodePort service.
+"""
+
 from locust import HttpUser, task, between
 import glob
 import uuid

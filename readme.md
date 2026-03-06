@@ -166,6 +166,33 @@ This project demonstrates several important cloud-native concepts:
 
 ---
 
+## Experiment Reproducibility
+
+Experiments are reproducible because:
+
+- **Fixed dataset:** 128 images in `client/inputfolder`
+- **Fixed runtime:** 2 minutes per Locust run
+- **Fixed spawn rate:** same rate across runs
+- **Fixed experiment matrix:** same (users, replicas) combinations each time
+
+---
+
+## Troubleshooting
+
+- **OOMKilled**  
+  Solution: increase container memory limit (e.g., 1024Mi) in the deployment YAML.
+
+- **NodePort not reachable**  
+  Solution: verify public IP and firewall rules allow traffic to the NodePort (e.g., 30007).
+
+- **ImagePullBackOff**  
+  Solution: verify container image exists and is accessible (image name and registry).
+
+- **Windows path issues**  
+  Solution: run scripts from repository root so relative paths resolve correctly.
+
+---
+
 ## License
 
 This project is intended for educational purposes as part of Monash Faculty of IT 2025 Fit5225 assignment. For educational purpose only.

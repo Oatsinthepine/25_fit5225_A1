@@ -70,7 +70,19 @@ def parse_argmuments() -> argparse.Namespace:
 def call_cloudpose_service(image:str, url: str, debug: bool = False) -> None:
 
     """
+    This is the core function to call the cloudpose service, it loads all images 
+    and assign uuid for each, then send http request to the cloudpose service
 
+    Args:
+        image: the path to the image
+        url: the url of the cloudpose service
+        debug: whether to print debug information
+
+    Returns:
+        None
+
+    Raises:
+        Exception: if there is an error in the http request
     """
     
     try:
@@ -112,8 +124,20 @@ def call_cloudpose_service(image:str, url: str, debug: bool = False) -> None:
 
 # gets list of all images path from the input folder
 def get_images_to_be_processed(input_folder: str) -> list[str]:
+
+    """
+    This function gets list of all images path from the input folder
+    and return a list of image paths
+
+    Args:
+        input_folder: the path to the input folder
+
+    Returns:
+        a list of image paths
+    """
+
     images = []
-    for image_file in glob.iglob(input_folder + "*.jpg"):
+    for image_file in glob.iglob(os.path.join(input_folder, "*.jpg")):
         images.append(image_file)
     return images
 
@@ -121,7 +145,18 @@ def get_images_to_be_processed(input_folder: str) -> list[str]:
 
 def main() -> None:
     """
-    Main function to parse arguments and call the cloudpose service
+    Main function to parse arguments and call the cloudpose service;
+    It will get all images from the input folder, and call the cloudpose service in parallel
+    and print the total time and average response time
+
+    Args:
+        None
+
+    Returns:
+        None
+
+    Raises:
+        Exception: if there is an error in the http request
     """
     
     args = parse_argmuments()
@@ -137,7 +172,6 @@ def main() -> None:
     
     #craete a worker  thread  to  invoke the requests in parallel
     with PoolExecutor(max_workers=num_workers) as executor:
-        # for _ in executor.map(call_cloudpose_service,  images):
         for _ in executor.map(lambda img: call_cloudpose_service(img, url, args.debug), images):
             pass
 
